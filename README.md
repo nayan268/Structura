@@ -2,34 +2,42 @@
 
 Structura is a next-generation distributed engineering canvas. Moving beyond traditional note-taking, it leverages Conflict-Free Replicated Data Types (CRDTs) to provide zero-latency collaborative editing, backed by an event-driven asynchronous architecture designed to handle high-frequency mutation payloads.
 
-Structura isn't just a passive document store; it is an active workspace equipped with hooks for local LLM inference and Vision-Language-Action models, designed to continuously parse, analyze, and compile architectural intent from raw engineering notes.
+Structura acts as an active workspace equipped with hooks for local LLM inference and Vision-Language-Action models, continuously parsing, analyzing, and compiling architectural intent from raw engineering notes without data leaving your local hardware.
 
-## Core Features
+## Core Architecture
 
-* **Zero-Latency Sync:** Implements CRDTs (Yjs/Automerge) over WebSockets for conflict-free, decentralized state resolution without operational transformation overhead.
-* **Distributed Event Bus:** Decouples live-editing from heavy backend processing. High-frequency socket events are fanned out via Redis Pub/Sub and dropped into AWS SQS for asynchronous worker consumption.
-* **Cold Storage & Telemetry:** Automated pipelines snapshot document states to AWS S3, triggering ETL workflows into Google BigQuery for historical diff analysis and usage telemetry.
-* **Edge-AI Native:** Built-in hooks designed for local GPU/CUDA execution of LLMs and Vision models to analyze canvas structures in real-time.
+* **Synchronous Path:** Zero-latency sync via CRDTs (Yjs) over FastAPI WebSockets.
+* **Pub/Sub Path:** Horizontal scaling and event fan-out via Redis.
+* **Asynchronous Path:** Background workers process document states for persistent cold storage in PostgreSQL and handle heavy AI inference tasks.
 
-## System Architecture
+---
 
-Structura enforces strict low-level design principles to ensure stability under load:
-* **Singleton Connection Pooling:** Prevents socket and database connection exhaustion across distributed nodes.
-* **Builder Pattern Mutations:** Ensures complex, multi-modal document updates (text, images, canvas diagrams) are structurally validated before network dispatch.
-* **Idempotent Handlers:** Guarantees robust state recovery and prevents duplicate data processing across at-least-once delivery queues.
+## Prerequisites Checklist
 
-## Tech Stack
+To run the complete distributed stack locally, ensure the following are installed:
 
-* **Backend:** Python, FastAPI, WebSockets
-* **Package Management:** `uv`
-* **Infrastructure:** Redis, AWS (S3, SQS, Lambda), Google BigQuery, Docker
+* **Containerization:** [Docker & Docker Compose](https://docs.docker.com/get-docker/) (for local Redis and PostgreSQL).
+* **Backend:** [uv](https://github.com/astral-sh/uv) (for lightning-fast Python dependency management and virtual environments).
+* **Frontend:** [Node.js 20+](https://nodejs.org/) (for the Vite + React SPA).
+* **Local Edge-AI (Optional but Recommended):** 
+  * [Ollama](https://ollama.com/) installed locally to serve models like Qwen2.5.
+  * NVIDIA CUDA Toolkit installed and configured to leverage the dedicated RTX 1000 Ada Generation GPU for hardware-accelerated local inference. 
+  * *Note: The full stack, including background workers and local LLM execution, runs comfortably within a 64GB RAM environment.*
 
-## Getting Started
+---
 
-Structura relies on `uv` for lightning-fast dependency management and virtual environment resolution.
+## Directory Structure
 
-### 1. Clone & Install Dependencies
-```bash
-git clone [https://github.com/yourusername/structura.git](https://github.com/yourusername/structura.git)
-cd structura
-uv sync
+```text
+structura/
+├── backend/
+│   ├── app/
+│   │   ├── api/          # FastAPI routes and WebSocket endpoints
+│   │   ├── core/         # Config and connection managers
+│   │   ├── models/       # SQLAlchemy schemas (Users, Workspaces, Documents)
+│   │   ├── services/     # CRDT merge logic and business rules
+│   │   └── workers/      # Async queue consumers for AI and storage
+│   ├── pyproject.toml    # Managed via uv
+│   └── .env
+├── frontend/             # Vite + React (Tldraw/Yjs integration)
+└── docker-compose.yml    # Local Redis & PostgreSQL infrastructure
