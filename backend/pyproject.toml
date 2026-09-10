@@ -1,0 +1,29 @@
+[project]
+name = "structura-engine"
+version = "0.1.0"
+description = "Distributed CRDT WebSocket Engine for Structura"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "redis>=5.2.0",
+    "sqlalchemy>=2.0.36",
+    "asyncpg>=0.30.0",
+    "pydantic>=2.9.2",
+    "pydantic-settings>=2.6.1",
+    "python-dotenv>=1.0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
