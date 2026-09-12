@@ -4,6 +4,10 @@ Structura is a next-generation distributed engineering canvas. Moving beyond tra
 
 Structura acts as an active workspace equipped with hooks for local LLM inference and Vision-Language-Action models, continuously parsing, analyzing, and compiling architectural intent from raw engineering notes without data leaving your local hardware.
 
+## Spec-driven development
+
+The project is intentionally run through a lightweight spec-first workflow. The current requirements and delivery plan live in [specs/README.md](specs/README.md), with the implementation contract tracked in [specs/prd.md](specs/prd.md) and the phased plan in [specs/implementation-plan.md](specs/implementation-plan.md).
+
 ## Core Architecture
 
 * **Synchronous Path:** Zero-latency sync via CRDTs (Yjs) over FastAPI WebSockets.
